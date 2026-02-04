@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+python-dotenv
+google-auth
+google-auth-oauthlib
+google-api-python-client
+openai
+pydantic
+python-jose
+httpx
+aiohttp
+python-multipart
+pydantic-settings
+pytest
+pytest-asyncio
