@@ -13,7 +13,7 @@ interface ChatMessageProps {
   onDeleteEmail?: (email: Email) => void;
 }
 
-function cleanMessageContent(content: string): string {
+function cleanMessageContent(content: string, hasEmails: boolean = false): string {
   let cleaned = content
     .replace(/```json[\s\S]*?```/g, '')
     .replace(/```[\s\S]*?```/g, '')
@@ -22,7 +22,31 @@ function cleanMessageContent(content: string): string {
     .replace(/I can use the following action:/gi, '')
     .trim();
   
-  cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+  if (hasEmails) {
+    cleaned = cleaned
+      .replace(/Here are your last \d+ emails.*?:/gi, '')
+      .replace(/I'll fetch your recent emails\..*$/gim, '')
+      .replace(/^\d+\.\s+\*\*Email from.*$/gim, '')
+      .replace(/^\d+\.\s+\*\*Newsletter from.*$/gim, '')
+      .replace(/^-\s+\*\*Email from.*$/gim, '')
+      .replace(/Here are your.*emails.*summary:?/gi, '')
+      .replace(/I'll fetch your recent emails\. Here are your last \d+ emails with a brief summary:/gi, '');
+    
+    const lines = cleaned.split('\n');
+    const filteredLines = lines.filter(line => {
+      const trimmed = line.trim();
+      if (/^\d+\.\s+\*\*/.test(trimmed) && /\(sent.*ago\)/.test(trimmed)) return false;
+      if (/^Email \d+:/.test(trimmed)) return false;
+      return true;
+    });
+    cleaned = filteredLines.join('\n');
+  }
+  
+  cleaned = cleaned.replace(/\n{3,}/g, '\n\n').trim();
+  
+  if (hasEmails && cleaned.length < 20) {
+    cleaned = "Here are your recent emails:";
+  }
   
   return cleaned;
 }
@@ -34,7 +58,8 @@ export default function ChatMessage({
   onDeleteEmail,
 }: ChatMessageProps) {
   const isUser = message.role === 'user';
-  const displayContent = isUser ? message.content : cleanMessageContent(message.content);
+  const hasEmails = emails && emails.length > 0;
+  const displayContent = isUser ? message.content : cleanMessageContent(message.content, hasEmails);
 
   return (
     <div
