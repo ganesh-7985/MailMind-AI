@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     google_client_secret: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
     google_redirect_uri: str = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/auth/callback")
     
-    # OpenAI
-    openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
+    # Groq
+    groq_api_key: str = os.getenv("GROQ_API_KEY", "")
     
     # JWT
     jwt_secret_key: str = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")

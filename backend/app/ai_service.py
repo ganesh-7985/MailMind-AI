@@ -1,4 +1,4 @@
-import openai
+from groq import Groq
 from typing import List, Optional, Tuple
 import logging
 import json
@@ -9,7 +9,7 @@ from .models import Email, ChatMessage
 
 logger = logging.getLogger(__name__)
 
-client = openai.OpenAI(api_key=settings.openai_api_key)
+client = Groq(api_key=settings.groq_api_key)
 
 SYSTEM_PROMPT = """You are an intelligent email assistant. You help users manage their Gmail inbox through natural conversation.
 
@@ -94,10 +94,10 @@ async def process_chat_message(
         # Add current user message
         messages.append({"role": "user", "content": f"User ({user_name}): {user_message}"})
         
-        logger.info(f"Sending chat request to OpenAI")
+        logger.info(f"Sending chat request to Groq")
         
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="llama-3.3-70b-versatile",
             messages=messages,
             temperature=0.7,
             max_tokens=1000
@@ -111,11 +111,8 @@ async def process_chat_message(
         
         return clean_message or ai_response, action
         
-    except openai.APIError as e:
-        logger.error(f"OpenAI API error: {e}")
-        raise Exception("AI service temporarily unavailable. Please try again.")
     except Exception as e:
-        logger.error(f"Chat processing error: {e}")
+        logger.error(f"Groq API error: {e}")
         raise Exception(f"Failed to process message: {str(e)}")
 
 
@@ -131,7 +128,7 @@ Content: {email.body[:2000]}
 Summary:"""
 
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3,
             max_tokens=150
@@ -166,7 +163,7 @@ Requirements:
 Reply:"""
 
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
             max_tokens=500
@@ -197,7 +194,7 @@ Example: {{"Work": [1, 3], "Promotions": [2], "Personal": [4, 5]}}
 Categories:"""
 
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3,
             max_tokens=200
@@ -233,7 +230,7 @@ Emails:
 Daily Digest:"""
 
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
             max_tokens=600
