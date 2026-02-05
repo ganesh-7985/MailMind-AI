@@ -2,7 +2,7 @@
 
 An AI-powered email assistant that lets you manage your Gmail inbox through natural conversation. Built with FastAPI and Next.js.
 
-**Live Demo:** [https://shankar-ganesh.vercel.app](https://shankar-ganesh.vercel.app) *(update after deployment)*
+**Live Demo:** [https://shankar-ganesh.vercel.app](https://shankar-ganesh.vercel.app) 
 
 ---
 
