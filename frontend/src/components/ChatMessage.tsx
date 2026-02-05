@@ -1,6 +1,7 @@
 'use client';
 
 import { Bot, User } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { ChatMessage as ChatMessageType, Email } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import EmailCard from './EmailCard';
@@ -12,6 +13,20 @@ interface ChatMessageProps {
   onDeleteEmail?: (email: Email) => void;
 }
 
+function cleanMessageContent(content: string): string {
+  let cleaned = content
+    .replace(/```json[\s\S]*?```/g, '')
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/\{[^{}]*"action"[^{}]*\}/g, '')
+    .replace(/To read these emails, I can use the following action:/gi, '')
+    .replace(/I can use the following action:/gi, '')
+    .trim();
+  
+  cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+  
+  return cleaned;
+}
+
 export default function ChatMessage({
   message,
   emails,
@@ -19,6 +34,7 @@ export default function ChatMessage({
   onDeleteEmail,
 }: ChatMessageProps) {
   const isUser = message.role === 'user';
+  const displayContent = isUser ? message.content : cleanMessageContent(message.content);
 
   return (
     <div
@@ -50,7 +66,13 @@ export default function ChatMessage({
               : 'bg-white text-gray-800 border border-gray-200 rounded-bl-md shadow-sm'
           )}
         >
-          <p className="whitespace-pre-wrap">{message.content}</p>
+          {isUser ? (
+            <p className="whitespace-pre-wrap">{displayContent}</p>
+          ) : (
+            <div className="prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-strong:text-gray-900">
+              <ReactMarkdown>{displayContent}</ReactMarkdown>
+            </div>
+          )}
         </div>
         
         {/* Show emails if available */}
